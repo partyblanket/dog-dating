@@ -1,11 +1,42 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
+import {BrowserRouter as Router, Route} from 'react-router-dom'
+import Nav from '../Nav';
+import Landing from '../Landing'
+import Profile from '../Profile'
 
-const App = () => {
+
+import * as ROUTES from '../../constants/routes'
+import SignUpPage from '../SignUp';
+import SignInPage from '../SignIn';
+import { withFirebase } from '../Firebase';
+
+
+const App = ({firebase}) => {
+
+  const [authUser, setAuthUser] = useState(null);
+
+  useEffect(() => {
+    firebase.auth.onAuthStateChanged((authUser) => {
+      console.log(authUser);
+      
+      authUser ? setAuthUser(authUser) : setAuthUser(null)
+        
+    })
+  })
+
   return (
-    <div>
-      <h1>App</h1>
-    </div>
+
+    <Router>
+      
+      <Nav authUser={authUser}/>
+      <hr />
+      <Route exact path={ROUTES.LANDING} component={Landing} />
+      <Route path={ROUTES.PROFILE} component={Profile} />
+      <Route path={ROUTES.SIGN_UP} component={SignUpPage} />
+      <Route path={ROUTES.SIGN_IN} component={SignInPage} />
+      
+    </Router>
   )
 }
 
-export default App;
+export default withFirebase(App);
